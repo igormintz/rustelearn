@@ -1,9 +1,9 @@
 [build]
-builder = "poetry"
-buildCommand = "poetry install --no-dev --no-interaction --no-ansi"
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
 
 [deploy]
-startCommand = "poetry run python main.py"
+startCommand = "python main.py"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
