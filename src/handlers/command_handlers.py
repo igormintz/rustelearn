@@ -5,7 +5,18 @@ from src.database.models import User
 from src.utils.openai_tools import OpenAITools
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle the /start command"""
+    """Handle the /start command from users.
+    
+    This function initializes a new user's profile in the database if they don't exist,
+    and sends a welcome message with interactive buttons for various learning options.
+    
+    Args:
+        update (Update): The Telegram update object containing the command
+        context (ContextTypes.DEFAULT_TYPE): The context object for the current update
+        
+    Returns:
+        None
+    """
     db = get_db_session()
     user = db.query(User).filter_by(telegram_id=str(update.effective_user.id)).first()
     
@@ -43,35 +54,72 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.close()
 
 async def check_progress(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle the /progress command"""
+    """Handle the /progress command to show user's learning progress.
+    
+    This function retrieves the user's learning statistics from the database and
+    generates a formatted message showing their progress, including:
+    - Overall learning level
+    - Topics mastered
+    - Topics in progress
+    - Recent activity
+    - Achievements earned
+    
+    Args:
+        update (Update): The Telegram update object containing the command
+        context (ContextTypes.DEFAULT_TYPE): The context object for the current update
+        
+    Returns:
+        None
+    """
     openai_tools = OpenAITools()
     progress = openai_tools.check_user_progress(str(update.effective_user.id))
     
-    if "error" in progress:
-        await update.message.reply_text(
-            "❌ Sorry, I couldn't find your progress data. Please start with /start first."
-        )
-        return
-    
+    # Format the progress message
     progress_message = (
-        "📊 *Your Learning Progress Report*\n\n"
-        f"🎯 Level: {progress['user_level']}\n"
-        f"📚 Topics Completed: {progress['topics_completed']}/{progress['total_topics']}\n"
-        f"📈 Completion: {progress['completion_percentage']:.1f}%\n"
-        f"⭐️ Average Mastery: {progress['average_mastery']:.1f}%\n"
-        f"🔥 Current Streak: {progress['streak_count']} days\n\n"
-        "💪 *Strong Topics:*\n"
-        f"{bullet_list(progress['strong_topics'])}\n"
-        "📝 *Areas for Improvement:*\n"
-        f"{bullet_list(progress['weak_topics'])}\n"
-        "👉 *Recommended Next Topics:*\n"
-        f"{bullet_list(progress['next_topics'])}"
+        f"📊 *Your Learning Progress*\n\n"
+        f"🎯 *Current Level:* {progress['user_level']}\n"
+        f"🔥 *Streak:* {progress['streak_count']} days\n\n"
+        f"📚 *Topics Mastered:*\n{bullet_list(progress['strong_topics'])}\n\n"
+        f"📖 *Topics in Progress:*\n{bullet_list(progress['weak_topics'])}\n\n"
+        f"🏆 *Achievements:*\n{bullet_list(progress['achievements'])}\n\n"
+        f"💪 *Practice Stats:*\n"
+        f"• Total Topics: {progress['total_topics']}\n"
+        f"• Average Mastery: {progress['average_mastery']:.1%}\n"
+        f"• Total Practice Sessions: {progress['total_practice_sessions']}"
     )
     
-    await update.message.reply_text(progress_message, parse_mode='Markdown')
+    keyboard = [
+        [
+            InlineKeyboardButton("📚 Continue Learning", callback_data="lesson_start"),
+            InlineKeyboardButton("⚙️ Settings", callback_data="settings")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text(
+        progress_message,
+        parse_mode='Markdown',
+        reply_markup=reply_markup
+    )
 
 async def mini_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle the /mini command for a quick, personalized lesson"""
+    """Handle the /mini command to generate a personalized mini-lesson.
+    
+    This function generates a customized Rust programming lesson based on the user's
+    current progress and learning level. The lesson includes:
+    - A focused topic
+    - Detailed explanation
+    - Code examples
+    - Related topics
+    - Practice suggestions
+    
+    Args:
+        update (Update): The Telegram update object containing the command
+        context (ContextTypes.DEFAULT_TYPE): The context object for the current update
+        
+    Returns:
+        None
+    """
     await update.message.reply_text("🤔 Generating a personalized mini-lesson for you...")
     
     openai_tools = OpenAITools()
@@ -101,6 +149,9 @@ async def mini_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [
             InlineKeyboardButton("✅ Mark as Complete", callback_data="lesson_complete"),
             InlineKeyboardButton("⏭️ Next Topic", callback_data="lesson_next")
+        ],
+        [
+            InlineKeyboardButton("⚙️ Settings", callback_data="settings")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -112,7 +163,17 @@ async def mini_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 def bullet_list(items: list) -> str:
-    """Helper function to format bullet point lists"""
+    """Format a list of items into a bullet-pointed string.
+    
+    This helper function takes a list of items and formats them into a string
+    with each item prefixed with a bullet point (•).
+    
+    Args:
+        items (list): List of items to format
+        
+    Returns:
+        str: Formatted string with bullet points, or "None yet" if the list is empty
+    """
     if not items:
         return "None yet"
     return "\n".join(f"• {item}" for item in items) 

@@ -1,25 +1,18 @@
 [tool.poetry]
 name = "rustelearning"
 version = "0.1.0"
-description = ""
+description = "A Telegram bot for learning Rust programming"
 authors = ["igormintz <igormintz@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-python-telegram-bot = "^22.0"
-sqlalchemy = "^2.0.39"
-aiohttp = "^3.11.14"
-python-dotenv = "^1.1.0"
-markdown = "^3.7"
-pillow = "^11.1.0"
-requests = "^2.32.3"
-youtube-dl = "^2021.12.17"
-redis = "^5.2.1"
-matplotlib = "^3.10.1"
-plotly = "^6.0.1"
-openai = "^1.68.2"
-
+python-telegram-bot = "^20.7"
+openai = "^1.12.0"
+SQLAlchemy = "^2.0.27"
+psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.0.1"
+schedule = "^1.2.1"
 
 [build-system]
 requires = ["poetry-core"]

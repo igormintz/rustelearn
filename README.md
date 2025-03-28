@@ -1,24 +1,46 @@
-# Rust Learning Bot 🦀
+# Rust Learning Bot 🤖
 
-A Telegram bot designed to help users learn Rust programming language through interactive lessons, practice exercises, and real-time feedback.
+A Telegram bot that helps users learn Rust programming through personalized lessons, interactive exercises, and progress tracking.
 
-## Features
+## Features 🚀
 
-- 📚 Interactive Rust programming lessons
-- 🎯 Practice exercises with difficulty progression
-- 💻 Direct integration with Rust Playground
-- 📊 Progress tracking and analytics
-- 🤖 AI-powered explanations and assistance
-- ✨ Personalized learning experience
+- **Personalized Learning Path**
+  - AI-powered lesson generation based on user progress
+  - Adaptive difficulty levels (Beginner, Intermediate, Advanced)
+  - Spaced repetition learning system
 
-## Prerequisites
+- **Interactive Learning Experience**
+  - Daily lessons and exercises
+  - Code examples with explanations
+  - Practice exercises with immediate feedback
+  - Integration with Rust Playground
 
-- Python 3.8 or higher
-- Poetry (Python package manager)
-- Telegram Bot Token
-- OpenAI API Key
+- **Progress Tracking**
+  - Detailed progress statistics
+  - Topic mastery tracking
+  - Learning streak counting
+  - Achievement system
 
-## Installation
+- **Customizable Settings**
+  - Message frequency preferences (1-3 times per day)
+  - Learning progress reset option
+  - Personalized notification schedule (8:00-21:00)
+
+## Commands 📝
+
+- `/start` - Initialize your profile and start learning
+- `/progress` - View your learning progress and statistics
+- `/mini` - Get a quick, personalized mini-lesson
+
+## Database Structure 💾
+
+The bot uses SQLite for persistent storage with the following main tables:
+- `users` - User profiles and preferences
+- `topics` - Learning content and materials
+- `user_progress` - Individual learning progress
+- `learning_sessions` - Session tracking and metrics
+
+## Setup 🛠️
 
 1. Clone the repository:
 ```bash
@@ -26,93 +48,47 @@ git clone https://github.com/yourusername/rust-learning-bot.git
 cd rust-learning-bot
 ```
 
-2. Install dependencies using Poetry:
+2. Install dependencies:
 ```bash
-poetry install
+pip install -r requirements.txt
 ```
 
-3. Create a `.env` file in the project root:
+3. Set up environment variables:
 ```bash
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-OPENAI_API_KEY=your_openai_api_key
+export TELEGRAM_BOT_TOKEN='your_bot_token'
+export OPENAI_API_KEY='your_openai_api_key'
+export DATABASE_URL='sqlite:///rust_learning_bot.db'  # Optional, defaults to this value
 ```
 
-## Project Structure
+4. Run the bot:
+```bash
+python main.py
+```
+
+## Project Structure 📁
 
 ```
 rust-learning-bot/
+├── main.py                 # Main bot entry point
+├── requirements.txt        # Python dependencies
 ├── src/
-│   ├── config/
-│   │   └── settings.py
-│   ├── database/
-│   │   ├── connection.py
-│   │   └── models.py
-│   ├── handlers/
-│   │   ├── callback_handlers.py
-│   │   └── command_handlers.py
-│   └── utils/
-│       └── openai_tools.py
-├── .env
-├── .gitignore
-├── main.py
-├── pyproject.toml
-└── README.md
+│   ├── config/            # Configuration settings
+│   ├── database/          # Database models and connection
+│   ├── handlers/          # Command and callback handlers
+│   └── utils/             # Utility functions and tools
+└── README.md              # This file
 ```
 
-## Usage
+## Contributing 🤝
 
-1. Start the bot:
-```bash
-poetry run python main.py
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-2. In Telegram, start a conversation with the bot:
-   - Use `/start` to begin
-   - Use `/mini` for quick lessons
-   - Use `/progress` to check your learning progress
-
-## Bot Commands
-
-- `/start` - Initialize the bot and see available options
-- `/progress` - Check your learning progress
-- `/mini` - Get a mini lesson
-- Interactive buttons for:
-  - Lesson navigation
-  - Practice exercises
-  - Rust Playground integration
-  - Progress tracking
-
-## Development
-
-1. Format code:
-```bash
-poetry run black .
-```
-
-2. Run linter:
-```bash
-poetry run flake8
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
+## License 📄
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+## Acknowledgments 🙏
 
-- Rust Programming Language Team
-- python-telegram-bot developers
-- OpenAI for content generation
-- YouTube for educational content
-
-## Support
-
-If you encounter any issues or have questions, please open an issue on GitHub or contact the maintainers.
+- OpenAI for providing the GPT API
+- Telegram Bot API team
+- Rust community for excellent documentation and resources
