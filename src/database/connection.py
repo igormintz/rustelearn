@@ -38,6 +38,7 @@ def get_db_session():
     """Get a database session."""
     db = SessionLocal()
     try:
-        yield db
-    finally:
-        db.close() 
+        return db  # Return the session directly instead of yielding
+    except Exception:
+        db.close()
+        raise

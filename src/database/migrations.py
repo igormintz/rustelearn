@@ -1,9 +1,13 @@
 from sqlalchemy import create_engine, text
 from src.config.settings import DATABASE_URL
+from src.database.models import Base
 
 def run_migrations():
     """Run database migrations to update the schema."""
     engine = create_engine(DATABASE_URL)
+    
+    # Create all tables if they don't exist
+    Base.metadata.create_all(engine)
     
     with engine.connect() as connection:
         # Check and add last_active column if it doesn't exist
