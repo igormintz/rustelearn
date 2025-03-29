@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from telegram import Update
 from telegram.ext import (
@@ -17,20 +18,8 @@ from src.utils.openai_tools import OpenAITools
 logger = setup_logging()
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle regular text messages from users in the Telegram chat.
-    
-    This function processes non-command text messages from users and generates appropriate responses
-    using the OpenAI integration. It ignores messages that start with '/' as those are handled by
-    command handlers.
-    
-    Args:
-        update (Update): The Telegram update object containing the message
-        context (ContextTypes.DEFAULT_TYPE): The context object for the current update
-        
-    Returns:
-        None
-    """
-    if update.message.text.startswith('/'):  # Ignore commands
+    """Handle regular text messages from users in the Telegram chat."""
+    if not update.message or not update.message.text or update.message.text.startswith('/'):  
         return
         
     openai_tools = OpenAITools()
@@ -39,7 +28,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def main():
     """Start the bot."""
-    application = None
     try:
         # Initialize database
         init_db()
@@ -53,31 +41,22 @@ async def main():
         application.add_handler(CommandHandler("mini", mini_lesson))
         application.add_handler(CallbackQueryHandler(handle_callback))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-        
-        # Start the bot
+
+        # ✅ Manually start bot without closing the event loop
         await application.initialize()
         await application.start()
-        
-        # Run polling
         await application.updater.start_polling()
-        application.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
-        
-        # Keep the application running using asyncio
-        while True:
-            await asyncio.sleep(3600)  # Sleep for an hour, then continue
+
+        logger.info("Bot is running...")
+
+        # Keep bot running without interfering with Railway’s event loop
+        await asyncio.Event().wait()  # Keeps the event loop alive
 
     except Exception as e:
-        logger.error(f"Error in bot operation: {e}", exc_info=True)
-    
-    finally:
-        # Gracefully stop the application if it exists
-        if application:
-            try:
-                await application.stop()
-                await application.updater.stop()
-            except Exception as stop_error:
-                logger.error(f"Error stopping application: {stop_error}")
+        logger.exception("Unhandled exception in main bot loop")
 
 if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+    try:
+        asyncio.run(main())  # Runs without messing with the event loop
+    except RuntimeError as e:
+        logger.error(f"Runtime error: {e}")
